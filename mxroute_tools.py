@@ -150,8 +150,7 @@ def command_dkim(domains):
         dns_data = make_api_request(DNS_CMD, {'domain': domain })
         dkim_data = next((item for item in dns_data['records'] if item.get('name') == DKIM_SUB), None)
         if dkim_data:
-            dkim_data = dkim_data['value']
-            dkim_data = dkim_data[1:len(dkim_data)-1]
+            dkim_data = dkim_data['value'].strip('"').replace(' ','')
 
         # Now test if it matches by looking up the live value on DNS
         # pip3 install dnspython
@@ -160,7 +159,7 @@ def command_dkim(domains):
         try:
             dns_lookup = dns.resolver.resolve(f"{DKIM_SUB}.{domain}", 'TXT')[0]
             for txt_string in dns_lookup.strings:
-                dkim_in_dns = dkim_in_dns + txt_string.decode('utf-8')
+                dkim_in_dns = dkim_in_dns + txt_string.decode('utf-8').replace(' ','')
         except Exception:
             dkim_in_dns = 'NONE'
 
