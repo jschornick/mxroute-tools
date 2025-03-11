@@ -195,7 +195,14 @@ def command_fwd(domains):
 
     # Parsing the string into a dictionary if the pattern matches
     fwds = []
-    pattern = r"([\w-]+(?:\.[\w-]+)*)@(\w+\.\w+).+?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+(?:,[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+)*)"
+    destination_pat = r"(?:{email}(?:,{email})*|{special})".format(
+        email = r"{mail_user}@{mail_domain}".format(
+            mail_user=r"[a-zA-Z0-9._%+-]+",
+            mail_domain=r"[a-zA-Z0-9.-]+"
+        ),
+        special=r":(?:fail|blackhole):"
+    )
+    pattern = r"([\w-]+(?:\.[\w-]+)*)@(\w+\.\w+).+?({dest})".format(dest=destination_pat)
     for line in lines:
         match = re.match(pattern, line)
         if match:
